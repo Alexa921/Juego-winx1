@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Winx: El Portador del Séptimo Enchantix</title>
+    <link rel="icon" href="img/Winx-logo.png" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- Pantalla de selección de protagonista -->
+        <div id="screen-select" class="screen active">
+            <img class="logo-fondo" src="img/Winx-logo.png" alt="logo winx">
+            <h2>Elige tu Winx favorita</h2>
+            <div class="options winx-selection">
+                <div class="winx-card" data-character="Bloom">
+                    <img src="img/Bloom.png" alt="Bloom" class="winx-img">
+                    <p class="bloom-text">Bloom</p>
+                </div>
+                <div class="winx-card" data-character="Stella">
+                    <img src="img/Stella.png" alt="Stella" class="winx-img">
+                    <p class="stella-text">Stella</p>
+                </div>
+                <div class="winx-card" data-character="Flora">
+                    <img src="img/Flora.png" alt="Flora" class="winx-img">
+                    <p class="flora-text">Flora</p>
+                </div>
+                <div class="winx-card" data-character="Musa">
+                    <img src="img/Musa.png" alt="Musa" class="winx-img">
+                    <p class="musa-text">Musa</p>
+                </div>
+                <div class="winx-card" data-character="Tecna">
+                    <img src="img/Tecna.png" alt="Tecna" class="winx-img tecna-img">
+                    <p class="tecna-text">Tecna</p>
+                </div>
+                <div class="winx-card" data-character="Aisha">
+                    <img src="img/Aisha.png" alt="Aisha" class="winx-img">
+                    <p class="aisha-text">Aisha</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla de selección de romance -->
+        <div id="screen-romance" class="screen">
+            <h2>Elige tu interés romántico</h2>
+            <div class="options">
+                <button class="select-romance" data-romance="Sky">Sky</button>
+                <button class="select-romance" data-romance="Brandon">Brandon</button>
+                <button class="select-romance" data-romance="Helia">Helia</button>
+                <button class="select-romance" data-romance="Riven">Riven</button>
+                <button class="select-romance" data-romance="Timmy">Timmy</button>
+                <button class="select-romance" data-romance="Nabu">Nabu</button>
+            </div>
+        </div>
+
+        <!-- Pantalla de juego principal -->
+        <div id="screen-game" class="screen">
+            <div class="story-image">
+                <img id="story-img" src="img/placeholder.jpg" alt="Escena">
+            </div>
+            <div class="story-text">
+                <p id="story-paragraph"></p>
+            </div>
+            <div class="story-options" id="story-options">
+                <!-- Botones de decisión aparecerán aquí -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
