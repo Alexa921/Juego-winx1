@@ -10,57 +10,61 @@
 <body>
     <div class="game-container">
 
-        <!-- ✅ PANTALLA DE INICIO -->
         <div id="screen-start" class="screen active">
             <img class="logo-fondo" src="img/Winx-logo.png" alt="logo winx">
             <p class="start-text">DA <span>CLICK</span> PARA COMENZAR</p>
         </div>
 
-        <!-- Pantalla de selección de protagonista -->
         <div id="screen-select" class="screen">
-            <h2>Elige tu Winx favorita!</h2>
-
+            <h2>Escoge a tu Winx!</h2>
             <div class="character-carousel">
-
-                <!-- Flecha izquierda -->
-                <button class="arrow-btn left-arrow">➤</button>
-
-                <!-- Tarjeta del personaje -->
+                <button class="arrow-btn left-arrow">◀</button>
                 <div class="character-card">
-                    <img id="character-img" src="img/Bloom - cara.png" alt="Bloom" class="character-img">
-                    <p id="character-name" class="character-name">Bloom</p>
+                    <img id="character-img" class="character-img" src="" alt="Winx Character">
+                    <h3 id="character-name" class="character-name"></h3>
                     <button class="select-btn">Seleccionar</button>
                 </div>
-
-                <!-- Flecha derecha -->
-                <button class="arrow-btn right-arrow">➤</button>
-
+                <button class="arrow-btn right-arrow">▶</button>
             </div>
+            <div id="character-title-display" class="title-display"></div> 
         </div>
 
-        <!-- Pantalla de selección de romance -->
         <div id="screen-romance" class="screen">
-            <h2>Elige tu interés romántico</h2>
-            <div class="options">
-                <button class="select-romance" data-romance="Sky">Sky</button>
-                <button class="select-romance" data-romance="Brandon">Brandon</button>
-                <button class="select-romance" data-romance="Helia">Helia</button>
-                <button class="select-romance" data-romance="Riven">Riven</button>
-                <button class="select-romance" data-romance="Timmy">Timmy</button>
-                <button class="select-romance" data-romance="Nabu">Nabu</button>
+            <h2>Escoge a tu Especialista!</h2>
+            <div class="character-carousel-romance">
+                <button class="arrow-btn left-arrow-romance">◀</button>
+                <div id="romance-card" class="character-card">
+                    <img id="romance-img" class="character-img" src="" alt="Specialist Character">
+                    <h3 id="romance-name" class="character-name"></h3>
+                    <button id="select-romance-btn" class="select-btn">Seleccionar</button>
+                </div>
+                <button class="arrow-btn right-arrow-romance">▶</button>
             </div>
+            <div id="romance-title-display" class="title-display"></div> 
         </div>
 
-        <!-- Pantalla de juego principal -->
         <div id="screen-game" class="screen">
-            <div class="story-image">
-                <img id="story-img" src="img/placeholder.jpg" alt="Escena">
-            </div>
-            <div class="story-text">
-                <p id="story-paragraph"></p>
-            </div>
-            <div class="story-options" id="story-options">
-                <!-- Botones de decisión aparecerán aquí -->
+
+            <img id="story-img" src="img/placeholder.jpg" alt="Escena" class="full-scene-img">
+
+            <div class="dialogue-container">
+
+                <div id="speaker-area" class="speaker-area">
+                    <img id="speaker-img" class="speaker-small-img" src="" alt="Speaker" />
+                    <div id="speaker-name-box" class="speaker-name-box">
+                        <span id="speaker-name"></span>
+                    </div>
+                </div>
+
+                <div id="dialogue-box" class="dialogue-box">
+                    <p id="story-paragraph" class="dialogue-text"></p>
+                    
+                    <div id="choices-box" class="choices-box"></div>
+
+                    <div id="continue-box" class="continue-box">
+                        <button id="continue-btn" class="continue-btn">CONTINUAR</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

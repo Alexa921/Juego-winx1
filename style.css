@@ -1,4 +1,4 @@
-/* style.css - CORRECCIÓN DEFINITIVA CON TRANSICIÓN CARDS TIPO MARIO DELUXE */
+/* style.css - AJUSTE FINAL Y CORRECCIÓN DE FLECHAS */
 
 html, body {
     height: 100%;
@@ -6,13 +6,13 @@ html, body {
     padding: 0;
     font-family: 'Arial', sans-serif;
     color: #333;
-    background: black; /* Fondo negro general */
-    overflow: hidden; /* Evita barras de desplazamiento innecesarias */
+    background: black;
+    overflow: hidden;
 }
 
 /* ------------------------------------------------------ */
 /* CONTENEDOR GENERAL */
-.game-container {
+.game-container { 
     width: 100%;
     height: 100vh;
     text-align: center;
@@ -22,23 +22,38 @@ html, body {
 /* ------------------------------------------------------ */
 /* PANTALLAS GENERALES */
 .screen { 
-    display: none; 
-    width: 100%; 
-    height: 100vh; 
-    position: absolute;
+    position: absolute; 
     top: 0; 
     left: 0;
-}
-
-.screen.active { 
+    width: 100%; 
+    height: 100vh; 
+    
+    opacity: 0; 
+    visibility: hidden; 
+    transform: scale(1);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    
     display: flex; 
     flex-direction: column; 
     align-items: center; 
     justify-content: center; 
+    z-index: 10;
+}
+
+.screen.active { 
+    opacity: 1; 
+    visibility: visible; 
+    z-index: 20; 
+}
+
+.screen.fade-out {
+    opacity: 0;
+    transform: translateX(-50px);
+    visibility: hidden; 
 }
 
 /* ------------------------------------------------------ */
-/* PANTALLA DE INICIO */
+/* PANTALLA DE INICIO (Sin cambios) */
 #screen-start {
     z-index: 100;
     background-image: url("img/fondo-inicio.jpg");
@@ -76,31 +91,24 @@ html, body {
 }
 
 /* ------------------------------------------------------ */
-/* SELECCIÓN DE PERSONAJE (CARRUSEL NUEVO) */
+/* SELECCIÓN DE PERSONAJE (CARRUSEL WINX) */
 #screen-select {
     background-image: url("img/fondo-inicio.jpg");
     background-size: cover;
     background-position: center;
-    opacity: 0;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+
+    opacity: 0; 
     transform: translateX(50px);
-    transition: opacity 0.8s ease, transform 0.8s ease;
+    transition: opacity 0.8s ease, transform 0.8s ease; 
+    z-index: 90; 
 }
 
-#screen-select.fade-in {
+#screen-select.active.fade-in {
     opacity: 1;
     transform: translateX(0);
 }
 
-/* Capa negra transparente */
+/* Capa negra transparente para Winx */
 #screen-select::before {
     content: "";
     position: absolute;
@@ -113,12 +121,16 @@ html, body {
 
 /* Elementos visibles por encima de la capa */
 #screen-select h2,
-.character-carousel {
+#screen-romance h2, 
+.character-carousel,
+.character-carousel-romance {
     position: relative;
     z-index: 2;
 }
 
-.character-carousel {
+/* CARRUSEL HORIZONTAL */
+.character-carousel,
+.character-carousel-romance {
     position: relative;
     display: flex;
     align-items: center;
@@ -132,7 +144,25 @@ html, body {
     text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
 }
 
-/* Flechas Laterales */
+/* ESTILO PARA LOS TÍTULOS DE PERSONAJES EN RECUADRO */
+.title-display {
+    position: relative;
+    z-index: 2;
+    margin: 20px auto 0 auto; 
+    padding: 10px 20px; 
+    border-radius: 8px;
+    font-size: 28px; 
+    color: white; 
+    font-weight: bold;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5); 
+    min-width: 300px; 
+    transition: opacity 0.3s ease; 
+    min-height: 40px;
+    display: block; 
+    text-align: center; 
+}
+
+/* Flechas Laterales (CORRECCIÓN DE DIRECCIÓN) */
 .arrow-btn {
     color: #0083bf;
     background-color: transparent;
@@ -145,7 +175,10 @@ html, body {
 }
 
 .arrow-btn:hover { opacity: 1; }
-.left-arrow { transform: rotate(180deg); }
+/* CLAVE: Eliminamos la rotación (transform: rotate) de las flechas. */
+/* Si usas los caracteres ◀ y ▶ en tu HTML, no necesitas CSS para rotarlas. */
+
+
 
 /* ------------------------------------------------------ */
 /* TARJETA DEL PERSONAJE CON TRANSICIÓN TIPO MARIO DELUXE */
@@ -155,32 +188,27 @@ html, body {
     padding: 20px;
     border-radius: 20px;
     text-align: center;
-    background-color: #79c9dd;
-    border: 4px solid #0083bf;
+    /* CLAVE: Quitamos los colores de fondo y borde de aquí. El JS los aplica. */
     position: relative; 
     z-index: 2;
     transition: transform 0.5s cubic-bezier(0.68,-0.55,0.27,1.55), opacity 0.5s ease;
     opacity: 1;
 }
 
-/* Entrada desde derecha o izquierda */
+/* Animaciones (Sin cambios) */
 .character-card.enter-right { transform: translateX(150%) scale(0.5); opacity: 0; }
 .character-card.enter-left { transform: translateX(-150%) scale(0.5); opacity: 0; }
-
-/* Estado final visible */
 .character-card.enter-active { transform: translateX(0) scale(1); opacity: 1; }
-
-/* Salida */
 .character-card.exit-left { transform: translateX(-150%) scale(0.5); opacity: 0; }
 .character-card.exit-right { transform: translateX(150%) scale(0.5); opacity: 0; }
 
 .character-img {
-    width: 300px;
+    width: 300px; 
     height: 300px;
     background-color: white;
     object-fit: cover;
     border-radius: 20px;
-    border: 4px solid #0083bf;
+    border: 4px solid #0083bf; /* El JS sobrescribe este borde */
 }
 
 .character-name {
@@ -191,85 +219,205 @@ html, body {
 }
 
 .select-btn {
-    margin-top: -40px;
+    margin-top: -40px; 
     padding: 10px 50px;
     border: none;
     border-radius: 8px;
     font-size: 25px;
     font-weight: bold;
     cursor: pointer;
-    background-color: #badffb;
-    border: 4px solid #0083bf;
+    background-color: #badffb; /* El JS sobrescribe este color */
+    border: 4px solid #0083bf; /* El JS sobrescribe este color */
     color: #0083bf;
     position: relative;
     z-index: 2;
 }
 
 /* ------------------------------------------------------ */
-/* PANTALLA DE ROMANCE Y JUEGO */
-#screen-romance.active, #screen-game.active {
-    max-width: 800px;
-    margin: 0 auto; 
-    padding: 20px;
+/* PANTALLA DE ROMANCE Y JUEGO (FONDO) - Sin cambios */
+
+#screen-romance {
+    background-image: url("img/Alfea-fondo-cap1.webp");
+    background-size: cover;
+    background-position: center;
+    z-index: 80;
 }
 
-.options {
+/* Capa negra transparente para Romance */
+#screen-romance::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.6); 
+    z-index: 1;
+}
+
+
+/* ------------------------------------------------------ */
+/* PANTALLA DE JUEGO ESPECÍFICA (GAME) - Sin cambios */
+
+#screen-game {
+    position: relative;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
+    flex-direction: column;
+    justify-content: flex-end; 
+    align-items: center;
+    z-index: 95; 
 }
 
-.options button {
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    background-color: #ffccff;
-    transition: 0.3s;
+.full-scene-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1; 
 }
 
-.options button:hover {
-    background-color: #d47adf;
+.dialogue-container {
+    position: relative;
+    width: 100%;
+    height: 35vh; 
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: auto; 
+}
+
+.dialogue-box {
+    width: 100%;
+    height: 100%;
+    min-height: 120px;
+    padding: 15px 30px;
+    background-color: rgba(255, 192, 203, 0.9); 
+    border-top: 5px solid white;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    transition: background-color 0.4s ease;
+}
+
+.dialogue-text {
     color: white;
+    font-size: 1.1em;
+    font-weight: 500;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+    margin: 0;
 }
 
-.story-image img {
-    max-width: 100%;
-    border-radius: 12px;
-    margin-bottom: 20px;
+.speaker-area {
+    position: absolute;
+    bottom: 95%; 
+    left: 20px;
+    display: flex;
+    align-items: flex-end; 
+    z-index: 6; 
 }
 
-.story-text {
-    font-size: 18px;
-    margin-bottom: 20px;
+.speaker-small-img {
+    width: 120px; 
+    height: auto;
+    object-fit: contain;
+    margin-right: -10px; 
+    transform: translateY(10px); 
+    border-bottom: none;
+    z-index: 7;
 }
 
-.story-options button {
-    display: block;
-    width: 80%;
-    margin: 10px auto;
-    padding: 10px;
-    border-radius: 8px;
-    background-color: #a832a8;
+.speaker-name-box {
+    background-color: rgba(255, 192, 203, 0.9); 
+    padding: 8px 15px;
+    border-radius: 5px 5px 0 0;
+    border: 3px solid white;
+    border-bottom: none;
+    box-shadow: 0 -2px 5px rgba(0,0,0,0.3);
+    transition: background-color 0.4s ease;
+}
+
+#speaker-name {
     color: white;
-    font-size: 16px;
-    cursor: pointer;
-    border: none;
-}
-
-.story-options button:hover {
-    background-color: #ff77ff;
+    font-weight: bold;
+    font-size: 1.1em;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
+    text-transform: uppercase;
 }
 
 /* ------------------------------------------------------ */
-/* Transición de pantallas más corta */
+/* BOTÓN CONTINUAR */
+
+.continue-box {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    margin-top: 10px;
+}
+
+.continue-btn {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2em;
+    font-weight: bold;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.9);
+    cursor: pointer;
+    text-decoration: underline;
+    transition: color 0.3s ease;
+}
+
+.continue-btn:hover {
+    color: #ffd0ec; 
+}
+
+/* ------------------------------------------------------ */
+/* CAJA DE ELECCIONES (OPCIONES) */
+
+.choices-box {
+    position: absolute;
+    top: 0; 
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8); 
+    z-index: 10; 
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    box-sizing: border-box;
+    display: none; 
+}
+
+.choices-box.active {
+    display: flex;
+}
+
+.choices-box button {
+    display: block;
+    width: 45%; 
+    padding: 20px; 
+    border-radius: 8px;
+    font-size: 1em; 
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s ease;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+}
+
+.choices-box button:hover {
+    filter: brightness(1.2); 
+}
+
 .screen.fade-out {
     opacity: 0;
     transform: translateX(-50px);
-    transition: opacity 0.4s ease, transform 0.4s ease; /* Tiempo reducido */
+    transition: opacity 0.4s ease, transform 0.4s ease; 
     background-color: black;
 }
-
