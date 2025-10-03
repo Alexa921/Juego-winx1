@@ -256,7 +256,8 @@ html, body {
 
 
 /* ------------------------------------------------------ */
-/* PANTALLA DE JUEGO ESPECÍFICA (GAME) - Sin cambios */
+/* PANTALLA DE JUEGO ESPECÍFICA (GAME) */
+/* ------------------------------------------------------ */
 
 #screen-game {
     position: relative;
@@ -265,79 +266,117 @@ html, body {
     justify-content: flex-end; 
     align-items: center;
     z-index: 95; 
+    width: 100%; 
+    height: 100%;
 }
 
+/* --- IMAGEN DE FONDO (ESCENA) --- */
 .full-scene-img {
-    position: absolute;
+    position: fixed; /* Usar fixed para cubrir todo el viewport */
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
+    
+    /* CAMBIO CLAVE: Usa el ancho total del viewport */
+    width: 100vw; 
+    
+    /* La altura se calcula restando la altura de la caja de diálogo. */
+    height: calc(100vh - 200px); /* Resta la altura del #text-box */
+    
+    /* Mantiene la imagen completa sin recortar */
+    object-fit: contain; 
+    
     z-index: -1; 
+    transition: opacity 0.5s ease-in-out;
+    background-color: #000; /* Fondo negro para llenar los huecos */
 }
 
+/* 💥 Contenedor de la caja de diálogo (100% de ancho, en la parte inferior) */
 .dialogue-container {
-    position: relative;
-    width: 100%;
+    position: absolute; 
+    bottom: 0;
+    left: 0;
+    width: 100%; 
     height: 35vh; 
     z-index: 5;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-top: auto; 
+    display: block;
 }
 
-.dialogue-box {
+/* 💥 La caja de diálogo principal (100% de ancho y color sólido) */
+#dialogue-box { 
     width: 100%;
-    height: 100%;
+    height: 80%; 
     min-height: 120px;
     padding: 15px 30px;
-    background-color: rgba(255, 192, 203, 0.9); 
+    margin-top: 64px;
+    
+    /* Fondo Rosa Sólido */
+    background-color: rgb(255, 192, 203); 
+
     border-top: 5px solid white;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    /* 💥 CAMBIO CRÍTICO: Alineamos arriba y usamos gap para la separación (quitamos space-between) */
+    justify-content: flex-start; 
+    gap: 15px; /* Pequeño espacio entre el texto y las opciones */
     align-items: flex-start;
     transition: background-color 0.4s ease;
 }
 
-.dialogue-text {
-    color: white;
-    font-size: 1.1em;
+/* 💥 El texto del diálogo */
+#story-paragraph { 
+    color: white; 
+    font-size: 22px;
     font-weight: 500;
-    text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+    text-shadow: none;
     margin: 0;
+    margin-top: 10px;
+    margin-bottom: 40px;
+    
+    width: 100%;
+    /* Mueve el texto hacia la derecha para que la Winx no lo tape */
+    padding-left: 140px; 
+    padding-top: 20px; /* Separación inicial con el borde superior */
+    box-sizing: border-box; 
 }
 
-.speaker-area {
+/* ------------------------------------------------------ */
+/* AJUSTE DEL NARRADOR (Winx pequeña y nombre: Superior Izquierda) */
+/* ------------------------------------------------------ */
+
+#speaker-area { 
     position: absolute;
-    bottom: 95%; 
-    left: 20px;
+    top: 0; 
+    left: 0; 
+    
     display: flex;
-    align-items: flex-end; 
-    z-index: 6; 
+    flex-direction: column; 
+    align-items: center; 
+    z-index: 100; 
+    padding: 10px; 
 }
 
-.speaker-small-img {
-    width: 120px; 
-    height: auto;
-    object-fit: contain;
-    margin-right: -10px; 
-    transform: translateY(10px); 
-    border-bottom: none;
-    z-index: 7;
+#speaker-img { 
+    width: 200px; /* Ajustado a un tamaño más pequeño y de mejor proporción */
+    height: 120px;
+    object-fit: cover;
+    margin-top: -100px; 
+    
+    /* 💥 SOLUCIÓN: Esto quita el borde de la imagen del personaje */
+    border: none; 
 }
 
-.speaker-name-box {
-    background-color: rgba(255, 192, 203, 0.9); 
-    padding: 8px 15px;
-    border-radius: 5px 5px 0 0;
+#speaker-name-box {
+    position: relative; 
+    padding: 5px 15px;
+    border-radius: 0 10px 0 10px; /* Bordes redondeados solo abajo */
     border: 3px solid white;
-    border-bottom: none;
-    box-shadow: 0 -2px 5px rgba(0,0,0,0.3);
-    transition: background-color 0.4s ease;
+    border-top: none; 
+    background-color: transparent; 
+    
+    text-align: center;
+    width: 100%; 
+    min-width: 100px; 
 }
 
 #speaker-name {
@@ -348,6 +387,56 @@ html, body {
     text-transform: uppercase;
 }
 
+/* ------------------------------------------------------ */
+/* 💥 ARREGLO CRÍTICO: OPCIONES (Botones de decisión) */
+/* ------------------------------------------------------ */
+
+#choices-box {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: 10px; /* Mantenemos una pequeña separación del texto */
+    padding: 0 140px; /* Espacio a los lados para que no choquen con la Winx */
+    box-sizing: border-box;
+}
+
+#choices-box button {
+    /* 💥 HACEMOS LOS BOTONES MÁS GRANDES Y FÁCILES DE VER */
+    font-size: 1.3em; /* Letra más grande */
+    padding: 15px 30px; /* Más padding para hacer la caja grande */
+    flex-grow: 1; /* Permite que los botones crezcan y se repartan el espacio */
+    margin: 0 10px; /* Espacio entre los botones */
+    min-width: 150px;
+    
+    /* Aseguramos estilos visuales, el JS le dará el color de fondo */
+    background-color: white; 
+    border-radius: 10px;
+    border: 4px solid #333; 
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+#choices-box button:hover {
+    filter: brightness(1.1);
+    transform: translateY(-2px);
+}
+
+/* Botón de Continuar */
+#continue-btn {
+    align-self: flex-end; 
+    margin-right: 10px; 
+    padding: 10px 40px;
+    /* (Asegúrate de que background-color y border NO estén aquí) */
+    cursor: pointer;
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, filter 0.2s ease; 
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+/* Efecto Hover para oscurecer */
+#continue-btn:hover {
+    filter: brightness(80%); /* Oscurece el color de fondo actual en un 20% */
+}
 /* ------------------------------------------------------ */
 /* BOTÓN CONTINUAR */
 

@@ -56,13 +56,19 @@
                     </div>
                 </div>
 
-                <div id="dialogue-box" class="dialogue-box">
-                    <p id="story-paragraph" class="dialogue-text"></p>
+                <div class="dialogue-container">
+                    <div id="speaker-area" class="speaker-area" style="display: none;">
+                        <img id="speaker-img" class="speaker-small-img" src="" alt="Narrador">
+                        <div id="speaker-name-box" class="speaker-name-box">
+                            <span id="speaker-name"></span>
+                        </div>
+                    </div>
                     
-                    <div id="choices-box" class="choices-box"></div>
-
-                    <div id="continue-box" class="continue-box">
-                        <button id="continue-btn" class="continue-btn">CONTINUAR</button>
+                    <div id="dialogue-box" class="dialogue-box">
+                        <p id="story-paragraph" class="dialogue-text"></p>
+                        
+                        <div id="choices-box"></div>
+                        <button id="continue-btn" style="display: none;">CONTINUAR</button>
                     </div>
                 </div>
             </div>
