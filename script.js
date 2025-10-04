@@ -404,8 +404,8 @@ function goToScene(index) {
     if(currentScene < scenes.length) {
         showScene();
     } else {
-        // Manejo de final de juego o error
-        alert(`Fin de la demostración. Puntos: Luz: ${player.points.luz}, Poder: ${player.points.poder}`);
+        // Antes se usaba alert aquí, pero ya no hace falta
+        console.warn("Se intentó ir a una escena inexistente:", index);
     }
 }
 
@@ -418,19 +418,68 @@ function startGame() {
     showScene();
 }
 
+// ✅ Nueva función para mostrar el final en pantalla
+function showEnding(title, message, player) {
+    document.getElementById("endTitle").innerText = title;
+    document.getElementById("endMessage").innerText = message;
+    document.getElementById("endPoints").innerText = 
+        `Puntos finales → Luz: ${player.points.luz}, Poder: ${player.points.poder}`;
+    document.getElementById("endScreen").classList.remove("hidden");
+}
+
+// ✅ Nueva función para reiniciar el juego
+function restartGame() {
+    document.getElementById("endScreen").classList.add("hidden");
+    goToScene(0); // ⚠️ Cambia el 0 si tu escena inicial no es la 0
+}
+
+
 /**
  * Muestra la escena actual, actualizando la imagen, el texto y el narrador.
  */
+/**
+ * Muestra la escena actual, actualizando la imagen, el texto y el narrador.
+ * ¡FUNCIÓN CORREGIDA Y AMPLIADA PARA VALTOR!
+ */
 function showScene() {
-    const scene = scenes[currentScene];
+    // 🛑 ASUMIENDO QUE currentScene Y scenes SON VARIABLES GLOBALES
+    // Si tu juego usa 'currentScene' para el ID, esta línea es correcta:
+    const scene = scenes[currentScene]; 
     
-    // 1. OBTENER LOS DATOS DEL NARRADOR (Winx o Especialista)
+    // 1. OBTENER LOS DATOS DEL ORADOR (Winx, Especialista, Valtor o Narrador)
     let narrator = null;
-    
+    let speakerColor = null;
+    let speakerBorder = null;
+    let speakerImgSrc = null;
+    let speakerNameText = null;
+    let speakerTextColor = null;
+
     if (scene.speaker === 'character') {
-        narrator = player.characterData; // Esto es la Winx seleccionada
+        narrator = player.characterData; // Winx seleccionada
+        speakerColor = narrator.color;
+        speakerBorder = darkenColor(speakerColor, 20);
+        speakerImgSrc = narrator.narrator_img;
+        speakerNameText = narrator.name.toUpperCase();
+        speakerTextColor = 'white';
     } else if (scene.speaker === 'romance') {
-        narrator = player.romanceData; // Esto es el Especialista seleccionado
+        narrator = player.romanceData; // Especialista seleccionado
+        speakerColor = narrator.color;
+        speakerBorder = darkenColor(speakerColor, 20);
+        speakerImgSrc = narrator.narrator_img;
+        speakerNameText = narrator.name.toUpperCase();
+        speakerTextColor = 'white';
+    } 
+    // 💥 CASO VALTOR: Usa la paleta morado/carmesí
+    else if (scene.speaker === 'villain') {
+        speakerColor = VALTOR_PALETTE.BACKGROUND;
+        speakerBorder = VALTOR_PALETTE.BORDER;
+        speakerImgSrc = VALTOR_PALETTE.IMG; 
+        speakerNameText = 'VALTOR'; 
+        speakerTextColor = VALTOR_PALETTE.TEXT_COLOR;
+        narrator = true; 
+    } else {
+        // Asignamos 'narrator' a false si no es personaje, romance o villano
+        narrator = false;
     }
     
     // Configuración por defecto de botones y opciones
@@ -438,71 +487,71 @@ function showScene() {
     choicesBox.classList.remove('active');
     continueBtn.style.display = 'none';
 
-    // 2. APLICAR ESTILOS, IMAGEN Y NOMBRE DEL NARRADOR
-    if (narrator) {
-        // --- NARRADOR CON PERSONAJE (Winx o Especialista) ---
+    // 2. APLICAR ESTILOS, IMAGEN Y NOMBRE DEL ORADOR
+    if (scene.speaker !== 'narrator' && narrator) { // Cambié 'if (narrator)' por una condición más clara.
+        // --- ORADOR ES UN PERSONAJE (Winx, Especialista o Valtor) ---
         
-        const color = narrator.color;
+        const color = speakerColor;
+        const darkBorder = speakerBorder;
+        const text_color = speakerTextColor;
         const lightColor = lightenColor(color, 25); 
-        const darkBorder = darkenColor(color, 20); 
-
-        // 💥 APLICAR COLORES DEL PERSONAJE A LA CAJA DE DIÁLOGO Y NOMBRE
+        
+        // 💥 APLICAR COLORES A LA CAJA DE DIÁLOGO Y NOMBRE
         dialogueBox.style.backgroundColor = color;
         dialogueBox.style.borderTop = `5px solid ${darkBorder}`;
         dialogueBox.style.borderLeft = `5px solid ${darkBorder}`;
         dialogueBox.style.borderRight = `5px solid ${darkBorder}`;
-        storyParagraph.style.color = 'white'; 
+        storyParagraph.style.color = text_color; 
         storyParagraph.style.textShadow = '1px 1px 2px rgba(0, 0, 0, 0.7)';
         
         speakerNameBox.style.backgroundColor = color;
         speakerNameBox.style.border = `3px solid ${darkBorder}`; 
-        speakerName.style.color = 'white'; 
+        speakerName.style.color = text_color; 
         speakerName.style.textShadow = '1px 1px 2px rgba(0, 0, 0, 0.7)';
-        speakerImg.style.border = 'none'; // Reemplazar la línea original por esto
+        speakerImg.style.border = 'none'; 
         
-        speakerImg.src = narrator.narrator_img;
-        speakerName.textContent = narrator.name.toUpperCase();
+        speakerImg.src = speakerImgSrc;
+        speakerName.textContent = speakerNameText;
         speakerArea.style.display = 'flex'; // Mostrar la caja del orador
 
         // 3. CREAR Y ESTILIZAR OPCIONES
-        if (scene.options && scene.options.length > 1) {
-             choicesBox.classList.add('active');
-             scene.options.forEach(opt => {
-                 const btn = document.createElement('button');
-                 
-                 // Reemplazar los puntos de efecto por un span estilizado
-                 const buttonText = opt.text.replace(/\((.*?)\)/, (match, p1) => {
-                     // 💥 APLICAR ESTILO AMARILLO A LOS PUNTOS DE EFECTO 
-                     return `<span style="color: ${NARRATOR_BORDER}; font-weight: bold; background-color: ${NARRATOR_BG}; padding: 2px 5px; border-radius: 5px; border: 2px solid ${NARRATOR_BORDER};">${p1}</span>`;
-                 });
-                 
-                 // Reemplazar los textos en negrita (**) por un span
-                 const finalButtonText = buttonText.replace(/\*\*(.*?)\*\*/g, (match, p1) => {
-                     // En las opciones del personaje, usamos negrita blanca para que resalte.
-                     return `<span style="font-weight: bold; color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);">${p1}</span>`;
-                 });
+        if (scene.options && scene.options.length >= 1) { // ✅ CORRECCIÓN
+            choicesBox.classList.add('active');
+            scene.options.forEach(opt => {
+                const btn = document.createElement('button');
+                
+                // Reemplazar los puntos de efecto por un span estilizado
+                const buttonText = opt.text.replace(/\((.*?)\)/, (match, p1) => {
+                    // 💥 ESTILO AMARILLO A LOS PUNTOS DE EFECTO 
+                    return `<span style="color: ${NARRATOR_BORDER}; font-weight: bold; background-color: ${NARRATOR_BG}; padding: 2px 5px; border-radius: 5px; border: 2px solid ${NARRATOR_BORDER};">${p1}</span>`;
+                });
+                
+                // Reemplazar los textos en negrita (**) por un span
+                const finalButtonText = buttonText.replace(/\*\*(.*?)\*\*/g, (match, p1) => {
+                    return `<span style="font-weight: bold; color: white; text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);">${p1}</span>`;
+                });
 
-                 btn.innerHTML = finalButtonText; // Usar innerHTML para el span
+                btn.innerHTML = finalButtonText; 
 
-                 // Aplicamos el color del personaje a los botones de opciones
-                 btn.style.backgroundColor = lightColor; // Color más claro para el botón
-                 btn.style.border = `4px solid ${darkBorder}`;
-                 btn.style.color = darkBorder; // Texto oscuro
+                // Aplicamos el color del orador a los botones de opciones
+                btn.style.backgroundColor = lightColor; // Color más claro para el botón
+                btn.style.border = `4px solid ${darkBorder}`;
+                btn.style.color = darkBorder; // Texto oscuro
 
-                 btn.addEventListener('click', () => {
-                     choicesBox.querySelectorAll('button').forEach(b => b.disabled = true);
-                     opt.action();
-                 });
-                 choicesBox.appendChild(btn);
-             });
-             
-             // 💥 Aplicar los estilos del texto en negrita (**) al texto de la escena del personaje
-             storyParagraph.innerHTML = scene.text(player).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                btn.addEventListener('click', () => {
+                    choicesBox.querySelectorAll('button').forEach(b => b.disabled = true);
+                    opt.action();
+                });
+                choicesBox.appendChild(btn);
+            });
+            
+            // 💥 Aplicar los estilos del texto en negrita (**)
+            storyParagraph.innerHTML = scene.text(player).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         } else {
-             // Si no hay opciones o solo hay una, usar texto simple
-             storyParagraph.textContent = scene.text(player);
-             // 💥 Aplicar los estilos del texto en negrita (**) al texto de la escena del personaje
-             storyParagraph.innerHTML = scene.text(player).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Si no hay opciones, usar texto simple 
+            storyParagraph.textContent = scene.text(player);
+            // 💥 Aplicar los estilos del texto en negrita (**)
+            storyParagraph.innerHTML = scene.text(player).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         }
     } else {
         // --- NARRADOR OMNISCIENTE / GENÉRICO (Tus colores amarillos) ---
@@ -517,77 +566,77 @@ function showScene() {
         
         speakerArea.style.display = 'none'; 
         
-        // 3. CREAR Y ESTILIZAR OPCIONES (Si solo hay una o más de una)
-        if (scene.options && scene.options.length > 1) {
-             choicesBox.classList.add('active');
-             scene.options.forEach(opt => {
-                 const btn = document.createElement('button');
-                 
-                 // Reemplazar los puntos de efecto por un span estilizado
-                 const buttonText = opt.text.replace(/\((.*?)\)/, (match, p1) => {
-                     // 💥 APLICAR ESTILO AMARILLO A LOS PUNTOS DE EFECTO 
-                     return `<span style="color: ${NARRATOR_BORDER}; font-weight: bold; background-color: ${darkenColor(NARRATOR_BG, 5)}; padding: 2px 5px; border-radius: 5px; border: 2px solid ${NARRATOR_BORDER};">${p1}</span>`;
-                 });
-                 
-                 // 💥 Reemplazar los textos en negrita (**) por un span
-                 const finalButtonText = buttonText.replace(/\*\*(.*?)\*\*/g, (match, p1) => {
-                     return `<span style="font-weight: bold; color: ${darkenColor(NARRATOR_TEXT, 10)}">${p1}</span>`;
-                 });
+        // 3. CREAR Y ESTILIZAR OPCIONES
+        if (scene.options && scene.options.length >= 1) { // ✅ CORRECCIÓN
+            choicesBox.classList.add('active');
+            scene.options.forEach(opt => {
+                const btn = document.createElement('button');
+                
+                // Reemplazar los puntos de efecto por un span estilizado
+                const buttonText = opt.text.replace(/\((.*?)\)/, (match, p1) => {
+                    // 💥 ESTILO AMARILLO A LOS PUNTOS DE EFECTO 
+                    return `<span style="color: ${NARRATOR_BORDER}; font-weight: bold; background-color: ${darkenColor(NARRATOR_BG, 5)}; padding: 2px 5px; border-radius: 5px; border: 2px solid ${NARRATOR_BORDER};">${p1}</span>`;
+                });
+                
+                // 💥 Reemplazar los textos en negrita (**) por un span
+                const finalButtonText = buttonText.replace(/\*\*(.*?)\*\*/g, (match, p1) => {
+                    return `<span style="font-weight: bold; color: ${darkenColor(NARRATOR_TEXT, 10)}">${p1}</span>`;
+                });
 
-                 btn.innerHTML = finalButtonText; // Usar innerHTML para el span
+                btn.innerHTML = finalButtonText; 
 
-                 // Aplicamos los colores amarillos a los botones de opciones
-                 btn.style.backgroundColor = NARRATOR_BG; 
-                 btn.style.border = `4px solid ${NARRATOR_BORDER}`;
-                 btn.style.color = NARRATOR_TEXT;
+                // Aplicamos los colores amarillos a los botones de opciones
+                btn.style.backgroundColor = NARRATOR_BG; 
+                btn.style.border = `4px solid ${NARRATOR_BORDER}`;
+                btn.style.color = NARRATOR_TEXT;
 
-                 btn.addEventListener('click', () => {
-                     choicesBox.querySelectorAll('button').forEach(b => b.disabled = true);
-                     opt.action();
-                 });
-                 choicesBox.appendChild(btn);
-             });
-             
-             // 💥 Aplicar los estilos del texto en negrita (**) al texto de la escena del narrador
-             storyParagraph.innerHTML = scene.text(player).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                btn.addEventListener('click', () => {
+                    choicesBox.querySelectorAll('button').forEach(b => b.disabled = true);
+                    opt.action();
+                });
+                choicesBox.appendChild(btn);
+            });
+            
+            // 💥 Aplicar los estilos del texto en negrita (**)
+            storyParagraph.innerHTML = scene.text(player).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         } else {
-             // Si no hay opciones o solo hay una, usar texto simple
-             storyParagraph.textContent = scene.text(player);
-             // 💥 Aplicar los estilos del texto en negrita (**) al texto de la escena del narrador
-             storyParagraph.innerHTML = scene.text(player).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            // Si no hay opciones, usar texto simple 
+            storyParagraph.textContent = scene.text(player);
+            // 💥 Aplicar los estilos del texto en negrita (**)
+            storyParagraph.innerHTML = scene.text(player).replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
         }
     }
     
     // Aplicar imagen de fondo de escena
     storyImg.src = scene.img;
+    
 
     // 4. MOSTRAR BOTÓN CONTINUAR (si solo hay una o ninguna opción)
-    if (!scene.options || scene.options.length <= 1) {
+    // 🛑 Modificación: Solo mostramos CONTINUAR si no hay NINGUNA opción (length === 0).
+    if (!scene.options || scene.options.length === 0) { // ✅ CORRECCIÓN
         continueBtn.style.display = 'block';
         
-        // 💥 APLICAR COLORES DEL NARRADOR AL BOTÓN CONTINUAR
-        if (narrator) {
-            // Botón de continuar usa los colores del personaje
-            const darkBorder = darkenColor(narrator.color, 20); 
-            continueBtn.style.backgroundColor = lightenColor(narrator.color, 40);
+        // 💥 APLICAR COLORES DEL ORADOR AL BOTÓN CONTINUAR
+        if (scene.speaker !== 'narrator' && narrator) { // Si es un personaje/villano
+            // Usa los colores del personaje/villano
+            const darkBorder = speakerBorder; 
+            continueBtn.style.backgroundColor = lightenColor(speakerColor, 40);
             continueBtn.style.border = `2px solid ${darkBorder}`;
             continueBtn.style.color = darkBorder;
-        } else {
-            // Botón de continuar usa los colores amarillos
+        } else { // Si es el narrador
+            // Usa los colores amarillos (narrador)
             continueBtn.style.backgroundColor = NARRATOR_BG;
             continueBtn.style.border = `2px solid ${NARRATOR_BORDER}`;
             continueBtn.style.color = NARRATOR_TEXT;
         }
         
         continueBtn.onclick = () => {
-            if (scene.options && scene.options.length === 1) {
-                scene.options[0].action(); 
-            } else {
-                nextScene(); 
-            }
+            // Si no hay opciones, siempre llamamos a nextScene()
+            nextScene(); 
         };
     }
 }
+// ... (El resto del código de scenes con Valtor como 'villain' en la Escena 25 y siguientes)
 
 // La matriz de escenas debe contener TODAS las sub-escenas
 const scenes = [
@@ -610,7 +659,7 @@ const scenes = [
     // 💥 2. Subcapítulo 3: PERTURBACIONES MÁGICAS (Especialista)
     {
         text: (player) => `“He detectado perturbaciones mágicas similares. Debemos investigar juntos, pero con cuidado. Este poder podría ser peligroso si cae en manos equivocadas.”`,
-        img: "img/escena2.png",
+        img: "img/escena3.png",
         speaker: 'romance', 
         options: [{ text: "Continuar...", action: () => nextScene() }] 
     },
@@ -618,7 +667,7 @@ const scenes = [
     // 💥 3. Subcapítulo 4: DECISIÓN CLAVE 1 (Narrador Omnisciente)
     {
         text: (player) => `Tu Especialista te ofrece su apoyo incondicional para investigar la marca. Debes tomar la primera decisión, eligiendo el camino que seguirá tu investigación.`,
-        img: "img/alfea-garden.jpg", 
+        img: "img/escena3.png", 
         speaker: 'narrator', 
         options: [
             { 
@@ -643,7 +692,7 @@ const scenes = [
     // 💥 4. TRANSICIÓN LUZ (Compartir)
     {
         text: (player) => `Compartir tu experiencia con el equipo alivia la tensión. Las Winx deciden reunirse en el **Jardín Mágico** para meditar juntas sobre el origen de la marca.`,
-        img: "img/alfea-garden.jpg", 
+        img: "img/escena4.png", 
         speaker: 'narrator', 
         options: [{ text: "Meditar juntas...", action: () => goToScene(5) }] 
     },
@@ -651,15 +700,15 @@ const scenes = [
     // 💥 5. NUEVA: CONSECUENCIA LUZ (Meditación y Visión)
     {
         text: (player) => `Juntas, en el Jardín Mágico, la energía de la marca en todas sus manos se sincroniza. Se revela una visión: el Séptimo Enchantix no es un objeto, sino un estado de armonía. Las Winx sienten que el Portal Parpadeante de mañana no es un peligro, sino una prueba de unidad.`,
-        img: "img/alfea-garden.jpg", 
+        img: "img/escena5.png", 
         speaker: 'narrator', 
-        options: [{ text: "Continuar al Capítulo 2...", action: () => goToScene(8) }] // Salta al Portal Parpadeante
+        options: [{ text: "Continuar...", action: () => goToScene(8) }] // Salta al Portal Parpadeante
     },
 
     // 💥 6. TRANSICIÓN PODER (Sola)
     {
         text: (player) => `Mantener el secreto te da una sensación de control. Te diriges a la **Sala de la Simulación** de Alfea, concentrándote en tu **Poder** innato.`,
-        img: "img/alfea-training.jpg", 
+        img: "img/", 
         speaker: 'narrator', 
         options: [{ text: "Probar tu fuerza...", action: () => goToScene(7) }] 
     },
@@ -669,7 +718,7 @@ const scenes = [
         text: (player) => `En la Sala de Simulación, canalizas la energía de la marca en un potente hechizo. El simulador colapsa, abrumado por el poder. Obtienes una certeza escalofriante: el Séptimo Enchantix está ligado a tu voluntad, pero su despertar podría desestabilizar la realidad si no lo controlas a la perfección. Te sientes lista para el Portal Parpadeante.`,
         img: "img/alfea-training.jpg", 
         speaker: 'narrator', 
-        options: [{ text: "Continuar al Capítulo 2...", action: () => goToScene(8) }] // Salta al Portal Parpadeante
+        options: [{ text: "Continuar...", action: () => goToScene(8) }] // Salta al Portal Parpadeante
     },
     
     // --- INICIO DEL CAPÍTULO 2 CON CONFLICTO ---
@@ -677,7 +726,7 @@ const scenes = [
     // 💥 8. ESCENA: PORTAL PARPADEANTE (Narrador Omnisciente)
     {
         text: (player) => `A la mañana siguiente, se encuentran frente a un portal que parpadea en azul y dorado, emanando energía inestable. Criaturas desconocidas comienzan a aparecer, algunas confundidas y otras hostiles. La energía del portal hace vibrar el suelo y los árboles cercanos.`,
-        img: "img/portal-parpadeante.jpg", 
+        img: "img/escena6.png", 
         speaker: 'narrator', 
         options: [{ text: "Observar el portal...", action: () => goToScene(9) }] 
     },
@@ -685,7 +734,7 @@ const scenes = [
     // 💥 9. ESCENA: REACCIÓN DE LA WINX (Narrador Personaje)
     {
         text: (player) => `“Nunca había sentido algo así… si cruzo, podré descubrir la fuente de este caos… pero debo estar preparada.”`,
-        img: "img/alfea-forest.jpg", 
+        img: "img/escena6.png", 
         speaker: 'character', 
         options: [{ text: "Analizar la situación...", action: () => goToScene(10) }] 
     },
@@ -693,7 +742,7 @@ const scenes = [
     // 💥 10. ESCENA: DECISIÓN DEL PORTAL (Narrador Omnisciente)
     {
         text: (player) => `Sientes la llamada de la magia al otro lado del portal. La decisión sobre cómo proceder debe ser inmediata.`,
-        img: "img/alfea-forest.jpg", 
+        img: "img/escena6.png", 
         speaker: 'narrator', 
         options: [
             { 
@@ -716,7 +765,7 @@ const scenes = [
     // 💥 11. ESCENA: PORTALES INESTABLES (Decisión Crucial)
     {
         text: (player) => `El portal anómalo en el bosque irradia una energía dual, mitad luz, mitad oscuridad. La confrontación es inevitable.`,
-        img: "img/portal.jpg", 
+        img: "img/escena7.png", 
         speaker: 'narrator', 
         options: [
             { 
@@ -770,7 +819,7 @@ const scenes = [
     // 💥 14. RAMIFICACIÓN 2: DEFENSA DE LUZ (Luz +1)
     {
         text: (player) => `La luz de tu escudo envolvió el portal. El caos se detiene, pero no se cierra. ${player.romance} te susurra: "Hemos ganado tiempo, pero ¿cómo lo cerramos sin dañarlo?"`,
-        img: "img/alfea-garden.jpg", 
+        img: "img/escena8.png", 
         speaker: 'romance', 
         options: [
             { 
@@ -801,21 +850,21 @@ const scenes = [
     // 💥 16. CONVERGENCIA Y DECISIÓN FINAL DEL CAPÍTULO 2 (El Cristal)
     {
         text: (player) => `El portal se cierra abruptamente, dejando tras de sí un único objeto: un misterioso **cristal de Zafiro**. Este cristal palpita, sincronizado con la marca del Séptimo Enchantix en tu mano. **¿Qué haces con el cristal?**`,
-        img: "img/alfea-forest.jpg", 
+        img: "img/escena9.png", 
         speaker: 'narrator', 
         options: [
             { 
                 text: "Entregar el cristal a Faragonda para su análisis: la magia es del universo, no mía. (Luz +3)", 
                 action: () => { 
                     player.points.luz += 3; 
-                    branchToChapter3(); // DEBE saltar a la Escena 17 (Luz) o 18 (Poder)
+                    goToScene(17); // AHORA VA DIRECTO A LA RAMIFICACIÓN LUZ
                 } 
             }, 
             { 
                 text: "Guardar el cristal para investigarlo en secreto: el poder es personal y debe ser controlado. (Poder +3)", 
                 action: () => { 
                     player.points.poder += 3; 
-                    branchToChapter3(); // DEBE saltar a la Escena 17 (Luz) o 18 (Poder)
+                    goToScene(18); // AHORA VA DIRECTO A LA RAMIFICACIÓN PODER
                 } 
             } 
         ]
@@ -825,8 +874,8 @@ const scenes = [
 
     // 💥 17. RAMIFICACIÓN LUZ: CAMINO DE LA SABIDURÍA (Búsqueda en Biblioteca)
     {
-        text: (player) => `Capítulo 3 – El Despertar de la Luz\n\nAl entregar el cristal, Faragonda te felicita. "Tu **Luz** interior ha primado el bien mayor." La Directora te guía a la Biblioteca Prohibida para que investigues sobre el Séptimo Enchantix.`,
-        img: "img/alfea-library.jpg", 
+        text: (player) => `El Despertar de la Luz\n\nAl entregar el cristal, Faragonda te felicita. "Tu **Luz** interior ha primado el bien mayor." La Directora te guía a la Biblioteca Prohibida para que investigues sobre el Séptimo Enchantix.`,
+        img: "img/escena10.png", 
         speaker: 'narrator', 
         options: [{ 
             text: "Buscar el pergamino más antiguo que hable de la Armonía.", 
@@ -836,7 +885,7 @@ const scenes = [
     
     // 💥 18. RAMIFICACIÓN PODER: CAMINO DEL CONTROL (Entrenamiento Secreto)
     {
-        text: (player) => `Capítulo 3 – El Despertar del Poder\n\nAl guardar el cristal, sientes su energía pulsando en secreto. Tu **Poder** personal te empuja a actuar sin supervisión. Te diriges a la Sala de Entrenamientos Mágicos de Alfea para practicar la canalización de la nueva energía.`,
+        text: (player) => `El Despertar del Poder\n\nAl guardar el cristal, sientes su energía pulsando en secreto. Tu **Poder** personal te empuja a actuar sin supervisión. Te diriges a la Sala de Entrenamientos Mágicos de Alfea para practicar la canalización de la nueva energía.`,
         img: "img/alfea-training.jpg", 
         speaker: 'narrator', 
         options: [{ 
@@ -848,7 +897,7 @@ const scenes = [
     // 💥 19. NUEVA: MISIÓN LUZ (El Manuscrito Antiguo)
     {
         text: (player) => `El pergamino antiguo describe el Séptimo Enchantix como la 'Llama Eterna de la Armonía'. Para despertarlo, debes encontrar un lugar donde el caos y la paz se unan. El texto indica: **El Bosque del Olvido**, donde las fronteras de los reinos se confunden. Sientes que la paz interior es el único camino.`,
-        img: "img/alfea-library.jpg", 
+        img: "img/escena11.png", 
         speaker: 'narrator', 
         options: [{ text: "Viajar al Bosque del Olvido...", action: () => goToScene(21) }] // Salta al Conflicto Final
     },
@@ -867,7 +916,7 @@ const scenes = [
     // 💥 21. ESCENA 1: BOSQUE DESORDENADO (Narrador Omnisciente)
     {
         text: (player) => `Al otro lado del portal, el bosque mágico está desordenado. Criaturas que no pertenecen a este reino se mueven de manera caótica, algunas atacan a los habitantes del lugar. Cada acción puede cambiar el resultado de este encuentro.`,
-        img: "img/bosque-caos.jpg", 
+        img: "img/escena12.png", 
         speaker: 'narrator', 
         options: [{ text: "Observar la situación...", action: () => goToScene(22) }] 
     },
@@ -875,7 +924,7 @@ const scenes = [
     // 💥 22. ESCENA 2: REACCIÓN (Winx)
     {
         text: (player) => `“No puedo quedarme observando… debo decidir si las enfrento o busco su origen.”`,
-        img: "img/alfea-forest.jpg", 
+        img: "img/escena12.png", 
         speaker: 'character', 
         options: [{ text: "Considerar el plan de acción...", action: () => goToScene(23) }] 
     },
@@ -883,60 +932,248 @@ const scenes = [
     // 💥 23. ESCENA 3: OPINIÓN DEL ESPECIALISTA (Especialista)
     {
         text: (player) => `“Si enfrentamos a las criaturas de manera directa, podemos ganar control, pero investigarlas podría revelar por qué llegaron aquí y ayudarnos a prevenir más caos.”`,
-        img: "img/alfea-forest.jpg", 
+        img: "img/escena12.png", 
         speaker: 'romance', 
         options: [{ text: "Tomar una decisión...", action: () => goToScene(24) }] 
     },
 
+    // ... (Tus escenas 0 a 24 permanecen sin cambios) ...
+
     // 💥 24. ESCENA 4: DECISIÓN DE ACCIÓN (Narrador Omnisciente)
     {
         text: (player) => `El tiempo se agota. La forma en que manejes este caos será el último acto que te llevará a la transformación.`,
-        img: "img/bosque-caos.jpg", 
+        img: "img/escena12.png", 
         speaker: 'narrator', 
         options: [
             { 
                 text: "Enfrentar las criaturas directamente con magia potente (Poder +1)", 
                 action: () => { 
                     player.points.poder += 1; 
-                    goToScene(25); // Salta a la Transformación
+                    goToScene(28); // <<<< CAMBIADO: Va a la Reflexión
                 } 
             }, 
             { 
                 text: "Investigar su origen y el portal con cautela (Luz +1)", 
                 action: () => { 
                     player.points.luz += 1; 
-                    goToScene(25); // Salta a la Transformación
+                    goToScene(28); // <<<< CAMBIADO: Va a la Reflexión
                 } 
             } 
         ]
     },
 
-    // 💥 25. ESCENA FINAL - LA CONSECUCIÓN DEL ENCHANTIX
+    // --- INICIO DE ACTO III: CONFLICTO Y RESOLUCIÓN (Reemplaza tu antigua Escena 25) ---
+
+   // ... (Continuación de la matriz de escenas después de la Escena 24)
+
+   // 💥 25. ESCENA FINAL: APARICIÓN DE VALTOR (Diálogo y Último Reto)
+    {
+        // Usamos el diálogo que tenías en la captura, pero lo ajustamos para Valtor y para que use la lógica de puntos si es necesario.
+        text: (player) => {
+            // Determinamos el texto inicial basado en la decisión anterior (si la escena 24 es la que lleva aquí)
+            const actionText = player.points.poder > player.points.luz ? 
+                "Tu ataque directo (Poder) rompe un hechizo de camuflaje y lo revela. " : 
+                "Tu cautelosa investigación (Luz) detecta una firma mágica oculta. ";
+                
+            // El diálogo de Valtor (adaptado del concepto que manejamos)
+            return `${actionText} Una figura emerge envuelta en energía oscura y carmesí. ¡Es **Valtor**! Sus ojos brillan con ambición. **Valtor:** "Sabía que la portadora del Enchantix vendría a mí. Este Séptimo Poder es demasiado grande para ser compartido con hadas ordinarias. Entrégamelo, y juntos dominaremos Magix. Tu marca no te otorga el equilibrio, ¡sino el **derecho a gobernar**!" Él te ataca para absorber tu energía. **¿Cómo respondes a su tentación y amenaza?**`
+        },
+        img: "img/valtor.jpg", // Asegúrate de que esta imagen exista
+        speaker: 'villain', // ¡Esto activa los estilos de Valtor!
+        options: [
+            { 
+                text: `Enfocarte en la defensa, buscando la debilidad en su orgullo (Luz +1)`, 
+                action: () => { 
+                    player.points.luz += 1; 
+                    goToScene(29); // Salta a la Escena 29: Transformación
+                } 
+            },
+            { 
+                text: `Lanzar tu ataque más poderoso para probar que no te dominará (Poder +1)`, 
+                action: () => { 
+                    player.points.poder += 1; 
+                    goToScene(29); // Salta a la Escena 29: Transformación
+                } 
+            }
+        ]
+},
+
+    // 💥 26. RUTA FINAL DE PODER (Si el Poder domina)
     {
         text: (player) => {
-            const isLuzDominant = player.points.luz > player.points.poder;
-            const style = isLuzDominant ? 
-                "armoniosa y etérea. Las alas crecen con un brillo dorado y suave, manifestando tu sabiduría, tu unidad con el equipo y el poder de la conexión." : 
-                "feroz y controlada. Las alas son de colores intensos y audaces, manifestando el dominio total sobre tu magia, tu voluntad inquebrantable y tu fuerza interior.";
-            
-            return `¡Fin del Capítulo 3 (Demo)!
-            
-            Tu acción final en el Bosque del Olvido hace que la marca en tu mano finalmente explote con luz. La convergencia de tu camino de **Luz** (${player.points.luz}) y **Poder** (${player.points.poder}) desbloquea la magia ancestral.
-            
-            **¡${player.character}, SÉPTIMO ENCHANTIX!**
-            
-            Tu transformación es ${style} Has forjado tu destino. La aventura continúa, y ahora, tienes el poder que buscabas.`;
+            return `Valtor grita: "¡Ingenua! ¡La **Supremacía** es mía!" Desata una tormenta de energía oscura. Pero la inestabilidad de su hechizo te da una oportunidad. Concentras el **Poder** puro de tu Séptimo Enchantix y lo diriges al corazón de su ataque, sin piedad ni arrepentimiento. El impacto es tan grande que Valtor se desintegra en polvo y sombras. **La victoria es tuya, pero ¿a qué costo?**`;
         },
-        img: "img/enchantix-transformation.jpg",
+        img: "img/victoria-poder.jpg",
+        speaker: 'narrator',
+        options: [{ text: "Ver el final del Poder...", action: () => goToScene(32) }]
+    },
+
+    // 💥 27. RUTA FINAL DE LUZ (Si la Luz domina)
+    {
+        text: (player) => {
+            return `Valtor se ríe: "¡Tu **Armonía** es tu condena!" Lanza un rayo de energía que busca consumir tu espíritu. Pero la calma de tu **Luz** interior transforma el ataque en un escudo de energía pura. Envuelves a Valtor, no para dañarlo, sino para neutralizarlo. Su forma se cristaliza, atrapado por la fuerza del equilibrio que intentó destruir. **La paz ha sido restaurada.**`;
+        },
+        img: "img/victoria-luz.jpg",
+        speaker: 'narrator',
+        options: [{ text: "Ver el final de la Luz...", action: () => goToScene(33) }]
+    },
+
+    // ASUME QUE LA ESCENA 28 ES ASÍ EN TU ARCHIVO DE ESCENAS
+    // 💥 28. ESCENA DE TRANSICIÓN: REFLEXIÓN ANTES DEL CONFLICTO
+    {
+        text: (player) => {
+            let reflection = "";
+            if (player.points.poder > player.points.luz) {
+                reflection = "Sientes que tu camino está cargado de Supremacía...";
+            } else if (player.points.luz > player.points.poder) {
+                reflection = "Percibes que la Armonía es tu verdadera fuerza...";
+            } else {
+                reflection = "El equilibrio entre Luz y Poder arde dentro de ti...";
+            }
+
+            return `...Tu destino. ${reflection} **Valtor** te espera. La lucha final está a punto de comenzar.`;
+        },
+
+        img: "img/magic_circle.jpg",
+        speaker: 'narrator',
+        options: [{ 
+            text: "Enfrentar a Valtor...", 
+            action: () => goToScene(29)  // ✅ Corrección hecha aquí
+        }]
+    },
+
+
+    // 💥 29. ESCENA: LA TRANSFORMACIÓN AL SÉPTIMO ENCHANTIX
+    {
+        text: (player) => {
+            const luz = player.points.luz;
+            const poder = player.points.poder;
+            
+            let transformText = "";
+
+            if (poder >= luz + 3) {
+                transformText = `Tu **Poder** es abrumador. Valtor se burla de tu ataque, pero la fuerza bruta de tu magia rompe su barrera. La furia te da control total. Gritas: **"¡Séptimo Enchantix: Supremacía de la Voluntad!"** Tu transformación es un torrente oscuro y dorado; controlas cada chispazo, una fuerza que ni Valtor puede ignorar.`;
+            } else if (luz >= poder + 3) {
+                transformText = `Tu **Luz** interior te guía. Esquivas su ataque y canalizas la energía del Bosque del Olvido, no para dañar, sino para estabilizar. Sientes la calma y la conexión con todas las Winx. Susurras: **"¡Séptimo Enchantix: Convergencia Eterna!"** Tu aura es pura y potente, un escudo de armonía que repele la oscuridad de Valtor.`;
+            } else {
+                transformText = `En el choque de hechizos, tu magia vacila entre la **Luz** y el **Poder**. Valtor sonríe ante tu indecisión, pero la necesidad de luchar te obliga a forzar la transformación. Te manifiestas con un estallido de energía inestable, mitad brillante, mitad sombría: **"¡Séptimo Enchantix: Equilibrio!"** Esta forma es volátil; el camino hacia la victoria será el más difícil.`;
+            }
+
+            return `Valtor te ataca. El impacto es brutal. Justo cuando tu energía se agota, sientes la verdad final: el Enchantix se despierta por lo que eres. ${transformText} **Valtor:** "¡Maldita hada! ¡Tanto poder, y lo usas para la armonía o para la debilidad! ¡Tendrás que usarlo para vencerme!" La batalla final comienza.`
+        },
+        img: "videos/enchantix.mp4", // Imagen épica de la transformación
+        speaker: 'character', 
+        options: [{ text: "Iniciar el Duelo Final...", action: () => goToScene(30) }] 
+    },
+
+   // 💥 30. ESCENA: DUELO FINAL CONTRA VALTOR
+    {
+        text: (player) => `El Séptimo Enchantix te da un poder inmenso. El aire se carga con tu nueva magia. Valtor es formidable, pero tu voluntad es más fuerte. Su arrogancia es su debilidad. Necesitas un último ataque, uno que refleje tu verdadera naturaleza para sellar la victoria.`,
+        img: "img/escena13.png", 
         speaker: 'narrator', 
         options: [
             { 
-                text: "Ver Puntuación Final de la Historia.", 
-                action: () => { 
-                    // Se utiliza alert como placeholder, en una app real sería un modal.
-                    alert(`¡Enchantix desbloqueado!\n\nTu puntuación final es:\n✨ Luz: ${player.points.luz}\n🔥 Poder: ${player.points.poder}`); 
-                } 
-            } 
+                text: `Ejecutar un ataque de **Poder** total para aniquilar su forma física.`, 
+                action: () => goToScene(26) // Final de Poder
+            },
+            { 
+                text: `Ejecutar un hechizo de **Luz** para sellar su espíritu y neutralizarlo.`, 
+                action: () => goToScene(27) // Final de Luz
+            },
+            { 
+                text: `Ejecutar un ataque **Doble** para someterlo y enviarlo a su prisión. (Equilibrio)`, 
+                action: () => goToScene(31) // Final de Equilibrio
+            }
         ]
-    }
+    },
+
+    // 💥 31. RUTA FINAL DE EQUILIBRIO (Si los puntos son cercanos)
+    {
+        text: (player) => {
+            return `Valtor te mira con desprecio. "**Equilibrio**... ¡La indecisión te costará la victoria!" Te ataca con un hechizo que absorbe ambas energías. Pero al unir tu **Poder** y **Luz**, tu hechizo se convierte en el lazo que lo ata, un equilibrio perfecto de fuerzas opuestas. Gritas el nombre de tu Especialista, y el recuerdo de su apoyo sella el hechizo, enviando a Valtor de vuelta a su prisión dimensional. **Magix está a salvo.**`;
+        },
+        img: "img/victoria-equilibrio.jpg",
+        speaker: 'narrator',
+        options: [{ text: "Ver el final del Equilibrio...", action: () => goToScene(34) }]
+    },
+
+    // --- FINALES DE LA HISTORIA ---
+
+    // 💥 32. EPÍLOGO: EL PRECIO DEL PODER (Final de la Ruta 26)
+    {
+        text: (player) => `Ganaste, pero el costo de la **Supremacía** es alto. Las Winx te temen un poco, y tu Especialista no reconoce la frialdad en tus ojos. Aunque Magix está a salvo, la llama de tu dragón quema demasiado fuerte, dejando una estela de soledad. **El poder absoluto corrompió la armonía.**`,
+        img: "img/epilogo-poder.jpg",
+        speaker: 'narrator',
+        options: [{ 
+            text: "FIN DEL JUEGO", 
+            action: () => showEnding(
+                "FIN: Supremacía",
+                "Ganaste, pero el costo de la Supremacía es alto. Las Winx te temen un poco...",
+                player
+            )
+        }]
+    },
+
+    // 💥 33. EPÍLOGO: LA RECOMPENSA DE LA LUZ (Final de la Ruta 27)
+    {
+        text: (player) => `La **Armonía** triunfa. Las Winx te abrazan, y tu Especialista te mira con orgullo. El Séptimo Enchantix se convierte en un símbolo de unidad. Has demostrado que la fuerza más grande de la Dimensión Mágica reside en el apoyo mutuo y la luz interior. **Magix celebra a su verdadera heroína.**`,
+        img: "img/epilogo-luz.jpg",
+        speaker: 'narrator',
+        options: [{ 
+            text: "FIN DEL JUEGO", 
+            action: () => showEnding(
+                "FIN: Supremacía",
+                "Ganaste, pero el costo de la Supremacía es alto. Las Winx te temen un poco...",
+                player
+            )
+        }]
+    },
+
+    // 💥 34. EPÍLOGO: EL LAZO PERFECTO (Final de la Ruta 31)
+    {
+        text: (player) => `El **Equilibrio** es perfecto. Las Winx, tu Especialista, y tú, son un equipo inquebrantable. El Séptimo Enchantix es el nuevo guardián de la balanza mágica, y tu relación con tu Especialista se fortalece como el pilar de tu estabilidad. Han salvado al mundo, juntos. **El verdadero poder es la unión.**`,
+        img: "img/epilogo-equilibrio.jpg",
+        speaker: 'narrator',
+        options: [{ 
+            text: "FIN DEL JUEGO", 
+            action: () => showEnding(
+                "FIN: Supremacía",
+                "Ganaste, pero el costo de la Supremacía es alto. Las Winx te temen un poco...",
+                player
+            )
+        }]
+    },
 ];
+
+// =========================================================
+// !!! CÓDIGO CRUCIAL QUE DEBE ESTAR FUERA DEL ARRAY SCENES !!!
+// =========================================================
+
+function goToFinalScene() {
+    // 1. Verificar el equilibrio de puntos
+    // NOTA: Es CRUCIAL que las variables 'player' y 'goToScene' existan y sean accesibles aquí.
+
+    const luz = player.points.luz;
+    const poder = player.points.poder;
+    const diff = Math.abs(luz - poder);
+    
+    let nextSceneId;
+
+    // 2. Lógica de los Tres Finales
+    if (diff <= 2) { 
+        // Si la diferencia es de 0, 1 o 2 puntos (Ej: Luz 8, Poder 10)
+        nextSceneId = 28; // Final 3: Equilibrio Inestable
+    } else if (poder > luz) { 
+        // Si Poder es claramente dominante
+        nextSceneId = 26; // Final 1: Control Absoluto
+    } else { 
+        // Si Luz es claramente dominante (Luz > Poder)
+        nextSceneId = 27; // Final 2: Armonía Eterna
+    }
+
+    // 3. Ejecutar el salto
+    console.log(`Puntos finales: Luz ${luz}, Poder ${poder}. Saltando a Escena ${nextSceneId}`);
+    goToScene(nextSceneId); 
+}
+
+// =========================================================
