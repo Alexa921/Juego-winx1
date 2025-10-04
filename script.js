@@ -594,7 +594,7 @@ const scenes = [
     // 💥 0. Subcapítulo 1: SUEÑOS INQUIETANTES (Narrador Omnisciente)
     {
         text: (player) => `Todas las Winx comienzan a tener sueños inquietantes: una voz desconocida les habla de un poder ancestral, el Séptimo Enchantix, capaz de equilibrar o destruir la magia de todos los reinos. Cada sueño deja una marca luminosa en la palma de su mano, que crece conforme se acercan al despertar del poder.`,
-        img: "img/escena1.png", 
+        img: "img/escena1.6.png", 
         speaker: 'narrator', 
         options: [{ text: "Continuar...", action: () => nextScene() }] 
     },
@@ -602,7 +602,7 @@ const scenes = [
     // 💥 1. Subcapítulo 2: LA VOZ DEL HADA (Winx)
     {
         text: (player) => `“Estos sueños… no parecen simples pesadillas. Siento que algo muy importante me llama.”`,
-        img: "img/alfea-garden.jpg", 
+        img: "img/escena2.png", 
         speaker: 'character', 
         options: [{ text: "Continuar...", action: () => nextScene() }] 
     },
@@ -610,7 +610,7 @@ const scenes = [
     // 💥 2. Subcapítulo 3: PERTURBACIONES MÁGICAS (Especialista)
     {
         text: (player) => `“He detectado perturbaciones mágicas similares. Debemos investigar juntos, pero con cuidado. Este poder podría ser peligroso si cae en manos equivocadas.”`,
-        img: "img/alfea-garden.jpg",
+        img: "img/escena2.png",
         speaker: 'romance', 
         options: [{ text: "Continuar...", action: () => nextScene() }] 
     },
