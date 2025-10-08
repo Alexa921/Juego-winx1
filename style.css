@@ -511,51 +511,97 @@ html, body {
     background-color: black;
 }
 
+/* ------------------------------------------------------ */
+/* PANTALLA FINAL (Estilo de Caja Central) */
+
+/* ------------------------------------------------------ */
+/* PANTALLA FINAL (Estilo de Caja Central con Fondo de Imagen) */
 
 .end-screen {
+  /* La superposición cubre toda la pantalla */
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #1e0033, #4b0082);
-  color: white;
+  
+  /* ⚠️ AHORA AÑADIMOS LA IMAGEN AQUÍ */
+  background-image: url('img/fondo-inicio.jpg'); 
+  background-size: cover;          
+  background-position: center center; 
+  background-repeat: no-repeat;
+  
+  /* Fondo semitransparente oscuro para enfocar (sirve como filtro oscuro sobre la imagen) */
+  /* Si quieres el fondo de la imagen más claro, puedes reducir la opacidad (e.g., rgba(0, 0, 0, 0.1)) */
+  background-color: rgba(0, 0, 0, 0.3); 
+  background-blend-mode: overlay; /* Esto mezcla el color y la imagen, dando un toque oscuro */
+  
+  /* Flexbox para centrar el cuadro de diálogo */
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  text-align: center;
+  
   font-family: 'Arial', sans-serif;
   z-index: 1000;
-  padding: 20px;
+  /* El resto de estilos se mantienen... */
 }
 
+/* El cuadro de diálogo azul central */
+.end-screen > div {
+    /* ... (El resto del estilo para el cuadro azul se queda igual) ... */
+    background-color: rgba(191, 222, 255, 0.95); 
+    border-radius: 20px; 
+    border: 4px solid #5aa8e2; 
+    padding: 40px;
+    width: 80%; 
+    max-width: 450px; 
+    text-align: center;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    color: #1a1a1a;
+}
+
+.end-screen > div .point-label {
+    color: white; /* ⬅️ Establece el color a blanco */
+    font-weight: bold; /* Opcional: para que resalten un poco más */
+}
+
+/* ... (El resto de tus estilos H2, P, y BUTTON se quedan igual) ... */
+/* Estilos de los elementos de texto dentro del cuadro */
 .end-screen h2 {
-  font-size: 2.5rem;
+  font-size: 45px;
+  font-weight: bold;
   margin-bottom: 20px;
+  color: #ffffff; /* Un azul más vibrante para el título */
 }
 
 .end-screen p {
-  font-size: 1.2rem;
+  font-size: 20px;
   margin: 10px 0;
+  line-height: 1.5;
+  color: #5aa8e2;
 }
 
+/* Estilo del botón "Reiniciar" */
 .end-screen button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 1rem;
-  background: #ff33cc;
-  border: none;
-  border-radius: 10px;
+  margin-top: 25px;
+  padding: 10px 30px;
+  font-size: 1.1rem;
+  /* Estilo de botón suave como el del ejemplo */
+  background-color: #79c5ff; /* Azul medio */
+  border: 2px solid #5aa8e2; /* Borde más oscuro */
+  border-radius: 15px; 
   color: white;
   cursor: pointer;
   transition: 0.3s;
+  font-weight: bold;
 }
 
 .end-screen button:hover {
-  background: #ff66e5;
+  background-color: #5aa8e2; /* Cambio de color al pasar el mouse */
 }
 
 .hidden {
-  display: none;
+  display: none !important; /* Importante para asegurar que se oculte */
 }

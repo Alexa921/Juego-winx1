@@ -422,15 +422,34 @@ function startGame() {
 function showEnding(title, message, player) {
     document.getElementById("endTitle").innerText = title;
     document.getElementById("endMessage").innerText = message;
-    document.getElementById("endPoints").innerText = 
-        `Puntos finales → Luz: ${player.points.luz}, Poder: ${player.points.poder}`;
+    
+    // ⚠️ CAMBIO CLAVE: Usamos <span> con la clase 'point-label' para las etiquetas
+    document.getElementById("endPoints").innerHTML = 
+        `<span class="point-label">Puntos finales:</span><br>
+        <span class="point-label">Luz:</span> ${player.points.luz}<br>
+        <span class="point-label">Poder:</span> ${player.points.poder}`;
+        
     document.getElementById("endScreen").classList.remove("hidden");
 }
 
-// ✅ Nueva función para reiniciar el juego
+// ✅ Función para reiniciar el juego (CORREGIDA)
+// ✅ Función para reiniciar el juego y volver a la pantalla de inicio
 function restartGame() {
+    // 1. Oculta la pantalla final
     document.getElementById("endScreen").classList.add("hidden");
-    goToScene(0); // ⚠️ Cambia el 0 si tu escena inicial no es la 0
+    
+    // 2. Oculta la pantalla de juego (screen-game) donde terminó la historia
+    // Asumiendo que tu sistema maneja qué pantalla está 'active' o visible, 
+    // debes desactivar la pantalla de juego.
+    document.getElementById("screen-game").classList.remove("active"); 
+    
+    // 3. Muestra la pantalla de inicio
+    document.getElementById("screen-start").classList.add("active"); 
+    
+    // 4. (Opcional, pero recomendado): Restablece variables de juego
+    // Si tienes variables globales como 'player', 'currentSceneIndex', etc., 
+    // debes reestablecerlas a sus valores iniciales aquí.
+    // Ejemplo: resetPlayerStats();
 }
 
 
