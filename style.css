@@ -1,4 +1,3 @@
-/* style.css - AJUSTE FINAL Y CORRECCIÓN DE FLECHAS */
 
 html, body {
     height: 100%;
@@ -108,7 +107,6 @@ html, body {
     transform: translateX(0);
 }
 
-/* Capa negra transparente para Winx */
 #screen-select::before {
     content: "";
     position: absolute;
@@ -119,7 +117,6 @@ html, body {
     z-index: 1;
 }
 
-/* Elementos visibles por encima de la capa */
 #screen-select h2,
 #screen-romance h2, 
 .character-carousel,
@@ -162,7 +159,7 @@ html, body {
     text-align: center; 
 }
 
-/* Flechas Laterales (CORRECCIÓN DE DIRECCIÓN) */
+/* Flechas Laterales */
 .arrow-btn {
     color: #0083bf;
     background-color: transparent;
@@ -175,8 +172,6 @@ html, body {
 }
 
 .arrow-btn:hover { opacity: 1; }
-/* CLAVE: Eliminamos la rotación (transform: rotate) de las flechas. */
-/* Si usas los caracteres ◀ y ▶ en tu HTML, no necesitas CSS para rotarlas. */
 
 
 
@@ -188,14 +183,13 @@ html, body {
     padding: 20px;
     border-radius: 20px;
     text-align: center;
-    /* CLAVE: Quitamos los colores de fondo y borde de aquí. El JS los aplica. */
     position: relative; 
     z-index: 2;
     transition: transform 0.5s cubic-bezier(0.68,-0.55,0.27,1.55), opacity 0.5s ease;
     opacity: 1;
 }
 
-/* Animaciones (Sin cambios) */
+/* Animaciones */
 .character-card.enter-right { transform: translateX(150%) scale(0.5); opacity: 0; }
 .character-card.enter-left { transform: translateX(-150%) scale(0.5); opacity: 0; }
 .character-card.enter-active { transform: translateX(0) scale(1); opacity: 1; }
@@ -208,7 +202,7 @@ html, body {
     background-color: white;
     object-fit: cover;
     border-radius: 20px;
-    border: 4px solid #0083bf; /* El JS sobrescribe este borde */
+    border: 4px solid #0083bf; 
 }
 
 .character-name {
@@ -226,8 +220,8 @@ html, body {
     font-size: 25px;
     font-weight: bold;
     cursor: pointer;
-    background-color: #badffb; /* El JS sobrescribe este color */
-    border: 4px solid #0083bf; /* El JS sobrescribe este color */
+    background-color: #badffb; 
+    border: 4px solid #0083bf; 
     color: #0083bf;
     position: relative;
     z-index: 2;
@@ -243,7 +237,6 @@ html, body {
     z-index: 80;
 }
 
-/* Capa negra transparente para Romance */
 #screen-romance::before {
     content: "";
     position: absolute;
@@ -256,7 +249,7 @@ html, body {
 
 
 /* ------------------------------------------------------ */
-/* PANTALLA DE JUEGO ESPECÍFICA (GAME) */
+/* PANTALLA DE JUEGO ESPECÍFICA */
 /* ------------------------------------------------------ */
 
 #screen-game {
@@ -272,25 +265,19 @@ html, body {
 
 /* --- IMAGEN DE FONDO (ESCENA) --- */
 .full-scene-img {
-    position: fixed; /* Usar fixed para cubrir todo el viewport */
+    position: fixed; 
     top: 0;
     left: 0;
-    
-    /* CAMBIO CLAVE: Usa el ancho total del viewport */
     width: 100vw; 
-    
-    /* La altura se calcula restando la altura de la caja de diálogo. */
-    height: calc(100vh - 200px); /* Resta la altura del #text-box */
-    
-    /* Mantiene la imagen completa sin recortar */
+    height: calc(100vh - 200px); 
     object-fit: contain; 
     
     z-index: -1; 
     transition: opacity 0.5s ease-in-out;
-    background-color: #000; /* Fondo negro para llenar los huecos */
+    background-color: #000; 
 }
 
-/* 💥 Contenedor de la caja de diálogo (100% de ancho, en la parte inferior) */
+/* Contenedor de la caja de diálogo */
 .dialogue-container {
     position: absolute; 
     bottom: 0;
@@ -301,7 +288,7 @@ html, body {
     display: block;
 }
 
-/* 💥 La caja de diálogo principal (100% de ancho y color sólido) */
+/* La caja de diálogo principal */
 #dialogue-box { 
     width: 100%;
     height: 80%; 
@@ -309,21 +296,20 @@ html, body {
     padding: 15px 30px;
     margin-top: 64px;
     
-    /* Fondo Rosa Sólido */
     background-color: rgb(255, 192, 203); 
 
     border-top: 5px solid white;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    /* 💥 CAMBIO CRÍTICO: Alineamos arriba y usamos gap para la separación (quitamos space-between) */
+
     justify-content: flex-start; 
-    gap: 15px; /* Pequeño espacio entre el texto y las opciones */
+    gap: 15px; 
     align-items: flex-start;
     transition: background-color 0.4s ease;
 }
 
-/* 💥 El texto del diálogo */
+/* El texto del diálogo */
 #story-paragraph { 
     color: white; 
     font-size: 22px;
@@ -334,14 +320,13 @@ html, body {
     margin-bottom: 10px;
     
     width: 100%;
-    /* Mueve el texto hacia la derecha para que la Winx no lo tape */
     padding-left: 140px; 
-    padding-top: 20px; /* Separación inicial con el borde superior */
+    padding-top: 20px; 
     box-sizing: border-box; 
 }
 
 /* ------------------------------------------------------ */
-/* AJUSTE DEL NARRADOR (Winx pequeña y nombre: Superior Izquierda) */
+/* AJUSTE DEL NARRADOR */
 /* ------------------------------------------------------ */
 
 #speaker-area { 
@@ -357,19 +342,17 @@ html, body {
 }
 
 #speaker-img { 
-    width: 200px; /* Ajustado a un tamaño más pequeño y de mejor proporción */
+    width: 200px; 
     height: 120px;
     object-fit: cover;
     margin-top: -100px; 
-    
-    /* 💥 SOLUCIÓN: Esto quita el borde de la imagen del personaje */
     border: none; 
 }
 
 #speaker-name-box {
     position: relative; 
     padding: 5px 15px;
-    border-radius: 0 10px 0 10px; /* Bordes redondeados solo abajo */
+    border-radius: 0 10px 0 10px; 
     border: 3px solid white;
     border-top: none; 
     background-color: transparent; 
@@ -388,27 +371,25 @@ html, body {
 }
 
 /* ------------------------------------------------------ */
-/* 💥 ARREGLO CRÍTICO: OPCIONES (Botones de decisión) */
+/* ARREGLO CRÍTICO: OPCIONES */
 /* ------------------------------------------------------ */
 
 #choices-box {
     display: flex;
     justify-content: space-around;
     width: 100%;
-    margin-top: 10px; /* Mantenemos una pequeña separación del texto */
-    padding: 0 140px; /* Espacio a los lados para que no choquen con la Winx */
+    margin-top: 10px; 
+    padding: 0 140px; 
     box-sizing: border-box;
 }
 
 #choices-box button {
-    /* 💥 HACEMOS LOS BOTONES MÁS GRANDES Y FÁCILES DE VER */
-    font-size: 1.3em; /* Letra más grande */
-    padding: 15px 30px; /* Más padding para hacer la caja grande */
-    flex-grow: 1; /* Permite que los botones crezcan y se repartan el espacio */
-    margin: 0 10px; /* Espacio entre los botones */
+    font-size: 1.3em; 
+    padding: 15px 30px; 
+    flex-grow: 1; 
+    margin: 0 10px; 
     min-width: 150px;
-    
-    /* Aseguramos estilos visuales, el JS le dará el color de fondo */
+
     background-color: white; 
     border-radius: 10px;
     border: 4px solid #333; 
@@ -426,17 +407,16 @@ html, body {
     align-self: flex-end; 
     margin-right: 10px; 
     padding: 10px 40px;
-    /* (Asegúrate de que background-color y border NO estén aquí) */
     cursor: pointer;
     transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, filter 0.2s ease; 
     border-radius: 10px;
     font-weight: bold;
 }
 
-/* Efecto Hover para oscurecer */
 #continue-btn:hover {
-    filter: brightness(80%); /* Oscurece el color de fondo actual en un 20% */
+    filter: brightness(80%); 
 }
+
 /* ------------------------------------------------------ */
 /* BOTÓN CONTINUAR */
 
@@ -464,7 +444,7 @@ html, body {
 }
 
 /* ------------------------------------------------------ */
-/* CAJA DE ELECCIONES (OPCIONES) */
+/* CAJA DE ELECCIONES */
 
 .choices-box {
     position: absolute;
@@ -512,43 +492,33 @@ html, body {
 }
 
 /* ------------------------------------------------------ */
-/* PANTALLA FINAL (Estilo de Caja Central) */
-
-/* ------------------------------------------------------ */
-/* PANTALLA FINAL (Estilo de Caja Central con Fondo de Imagen) */
+/* PANTALLA FINAL */
 
 .end-screen {
-  /* La superposición cubre toda la pantalla */
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   
-  /* ⚠️ AHORA AÑADIMOS LA IMAGEN AQUÍ */
   background-image: url('img/fondo-inicio.jpg'); 
   background-size: cover;          
   background-position: center center; 
   background-repeat: no-repeat;
   
-  /* Fondo semitransparente oscuro para enfocar (sirve como filtro oscuro sobre la imagen) */
-  /* Si quieres el fondo de la imagen más claro, puedes reducir la opacidad (e.g., rgba(0, 0, 0, 0.1)) */
   background-color: rgba(0, 0, 0, 0.3); 
-  background-blend-mode: overlay; /* Esto mezcla el color y la imagen, dando un toque oscuro */
+  background-blend-mode: overlay; 
   
-  /* Flexbox para centrar el cuadro de diálogo */
   display: flex;
   justify-content: center;
   align-items: center;
   
   font-family: 'Arial', sans-serif;
   z-index: 1000;
-  /* El resto de estilos se mantienen... */
 }
 
-/* El cuadro de diálogo azul central */
+
 .end-screen > div {
-    /* ... (El resto del estilo para el cuadro azul se queda igual) ... */
     background-color: rgba(191, 222, 255, 0.95); 
     border-radius: 20px; 
     border: 4px solid #5aa8e2; 
@@ -563,17 +533,15 @@ html, body {
 }
 
 .end-screen > div .point-label {
-    color: white; /* ⬅️ Establece el color a blanco */
-    font-weight: bold; /* Opcional: para que resalten un poco más */
+    color: white; 
+    font-weight: bold; 
 }
 
-/* ... (El resto de tus estilos H2, P, y BUTTON se quedan igual) ... */
-/* Estilos de los elementos de texto dentro del cuadro */
 .end-screen h2 {
   font-size: 45px;
   font-weight: bold;
   margin-bottom: 20px;
-  color: #ffffff; /* Un azul más vibrante para el título */
+  color: #ffffff;
 }
 
 .end-screen p {
@@ -583,14 +551,12 @@ html, body {
   color: #5aa8e2;
 }
 
-/* Estilo del botón "Reiniciar" */
 .end-screen button {
   margin-top: 25px;
   padding: 10px 30px;
   font-size: 1.1rem;
-  /* Estilo de botón suave como el del ejemplo */
-  background-color: #79c5ff; /* Azul medio */
-  border: 2px solid #5aa8e2; /* Borde más oscuro */
+  background-color: #79c5ff; 
+  border: 2px solid #5aa8e2;
   border-radius: 15px; 
   color: white;
   cursor: pointer;
@@ -599,9 +565,9 @@ html, body {
 }
 
 .end-screen button:hover {
-  background-color: #5aa8e2; /* Cambio de color al pasar el mouse */
+  background-color: #5aa8e2; 
 }
 
 .hidden {
-  display: none !important; /* Importante para asegurar que se oculte */
+  display: none !important;
 }
